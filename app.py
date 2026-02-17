@@ -2,6 +2,7 @@ import os
 import pickle
 import cv2
 import mediapipe as mp
+print("MEDIAPIPE DEBUG:", mp, getattr(mp, "__file__", None), dir(mp)[:30])
 import numpy as np
 from flask import Flask, render_template, Response, jsonify, request
 import base64
