@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASL Vision Translator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+
+    <nav class="top-nav reveal" style="--delay:0s;">
+        <a class="nav-brand" href="https://youthforchallenge.org" target="_blank" rel="noopener noreferrer" aria-label="Youth For Challenge Official Website">
+            <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Youth For Challenge Logo" class="nav-logo">
+            <span>YFC</span>
+        </a>
+        <a href="#yfc" data-i18n="nav_yfc">Youth For Challenge</a>
+        <a href="#tutorial" data-i18n="nav_tutorial">Mini Tutoriel ASL</a>
+        <a href="#app" data-i18n="nav_app">Camera & Traduction</a>
+        <div class="top-nav-controls">
+            <div class="lang-switch" aria-label="Language switcher">
+                <button class="lang-btn active" data-lang="fr" type="button">FR</button>
+                <button class="lang-btn" data-lang="en" type="button">EN</button>
+            </div>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Changer le theme" data-i18n="theme_light">Theme clair</button>
+        </div>
+    </nav>
+
+    <header class="hero reveal">
+        <div class="hero-left">
+            <p class="eyebrow">ASL / WEBCAM / IA</p>
+            <h1 data-i18n="hero_title">Translateur de signes en lettres, en direct.</h1>
+            <p class="subtitle" data-i18n="hero_subtitle">Une interface premium pour convertir les signes ASL en texte avec une experience visuelle moderne et fluide.</p>
+        </div>
+    </header>
+
+    <section id="yfc" class="about panel reveal" style="--delay:0.12s;">
+        <div class="about-head">
+            <h2 data-i18n="about_title">Youth For Challenge Organization</h2>
+            <p data-i18n="about_subtitle">Section d'information et de sensibilisation.</p>
+        </div>
+        <div class="about-grid">
+            <article>
+                <h3 data-i18n="mission_title">Mission</h3>
+                <p data-i18n="mission_body">Youth For Challenge accompagne les jeunes sur les projets d'innovation, l'engagement citoyen et l'inclusion numerique.</p>
+            </article>
+            <article>
+                <h3 data-i18n="why_title">Pourquoi ce projet ASL</h3>
+                <p data-i18n="why_body">Cette application favorise l'accessibilite en simplifiant la communication entre personnes qui utilisent la langue des signes et le public.</p>
+            </article>
+            <article>
+                <h3 data-i18n="impact_title">Impact attendu</h3>
+                <p data-i18n="impact_body">Former, sensibiliser et deployer des outils pratiques dans les ecoles, clubs et evenements communautaires.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="tutorial" class="tutorial panel reveal" style="--delay:0.2s;">
+        <div class="about-head">
+            <h2 data-i18n="tutorial_title">Mini Tutoriel ASL Anime</h2>
+            <p data-i18n="tutorial_subtitle">Decouvre quelques gestes de base avant la capture live.</p>
+        </div>
+        <div class="tutorial-stage">
+            <div class="gesture-badge" id="tutorialLetter">A</div>
+            <div class="tutorial-info">
+                <h3 id="tutorialTitle">Lettre A</h3>
+                <p id="tutorialDesc">Ferme les doigts en poing, pouce sur le cote de l'index.</p>
+            </div>
+        </div>
+        <div class="tutorial-controls">
+            <button id="prevTutorial" class="btn btn-ghost" type="button" data-i18n="prev">Precedent</button>
+            <button id="playTutorial" class="btn btn-primary" type="button" data-i18n="pause">Pause animation</button>
+            <button id="nextTutorial" class="btn btn-ghost" type="button" data-i18n="next">Suivant</button>
+        </div>
+    </section>
+
+    <main id="app" class="dashboard">
+        <section class="panel camera-panel reveal" style="--delay:0.08s;">
+            <div class="panel-head">
+                <h2 data-i18n="capture_live">Capture Live</h2>
+                <div class="status-badge" id="camStatus">Camera inactive</div>
+            </div>
+            <div class="camera-shell">
+                <video id="webcam" autoplay playsinline muted></video>
+                <div class="scanline"></div>
+                <div class="frame-glow"></div>
+            </div>
+            <div class="camera-actions">
+                <button id="startBtn" class="btn btn-primary" data-i18n="start_cam">Demarrer webcam</button>
+                <button id="stopBtn" class="btn btn-secondary" disabled data-i18n="stop_cam">Arreter</button>
+            </div>
+        </section>
+
+        <section class="panel translate-panel reveal" style="--delay:0.16s;">
+            <div class="panel-head">
+                <h2 data-i18n="translation">Traduction</h2>
+                <div class="live-dot" data-i18n="live">Live</div>
+            </div>
+
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <span class="label" data-i18n="detected_sign">Signe detecte</span>
+                    <strong id="predictedChar">-</strong>
+                </div>
+                <div class="insight-card">
+                    <span class="label" data-i18n="confirmed_sign">Derniere lettre validee</span>
+                    <strong id="confirmedChar">-</strong>
+                </div>
+                <div class="insight-card progress-card">
+                    <span class="label" data-i18n="validation">Validation</span>
+                    <div class="progress-wrap">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <small id="progressText">En attente...</small>
+                </div>
+            </div>
+
+            <label for="resultText" class="text-label" data-i18n="translated_text">Texte traduit</label>
+            <textarea id="resultText" readonly placeholder="La traduction apparait ici..." data-i18n-placeholder="translated_placeholder"></textarea>
+
+            <div class="text-actions">
+                <button class="btn btn-ghost" data-action="space" data-i18n="space">Espace</button>
+                <button class="btn btn-ghost" data-action="backspace" data-i18n="backspace">Retour</button>
+                <button class="btn btn-ghost" data-action="enter" data-i18n="newline">Nouvelle ligne</button>
+                <button class="btn btn-danger" data-action="clear" data-i18n="clear">Effacer</button>
+            </div>
+        </section>
+
+        <section class="panel config-panel reveal" style="--delay:0.24s;">
+            <div class="panel-head">
+                <h2 data-i18n="settings">Reglages</h2>
+            </div>
+            <div class="config-group">
+                <label for="delayRange" data-i18n="confirm_delay">Delai de confirmation (secondes)</label>
+                <div class="range-row">
+                    <input id="delayRange" type="range" min="1" max="5" value="2">
+                    <span id="delayValue">2s</span>
+                </div>
+            </div>
+            <div class="config-group toggles">
+                <label><input id="soundToggle" type="checkbox"> <span data-i18n="ui_sounds">Sons UI + confirmation</span></label>
+                <label><input id="skeletonToggle" type="checkbox"> <span data-i18n="show_skeleton">Afficher squelette main (serveur)</span></label>
+            </div>
+            <button id="saveConfigBtn" class="btn btn-primary full" data-i18n="apply_settings">Appliquer les reglages</button>
+        </section>
+    </main>
+
+    <canvas id="captureCanvas" width="640" height="480"></canvas>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
